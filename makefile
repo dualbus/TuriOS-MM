@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS += -Wall -ansi
+CFLAGS += -W -Wall -Wstrict-prototypes -ansi -pedantic -g
 
 SRCS = 	main.c		\
 		mm.c		\
@@ -9,8 +9,9 @@ SRCS = 	main.c		\
 OBJS = ${SRCS:.c=.o}
 PROG = prog
 
-.SUFFIXES:	.c .o
+.SUFFIXES:	.h .c .o
 
+.h.c:
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 

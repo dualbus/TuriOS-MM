@@ -1,5 +1,6 @@
 #include "stdlib.h"
 
+/* FIXME: implement */
 void *
 malloc(size_t size)
 {
@@ -7,6 +8,7 @@ malloc(size_t size)
     return ptr;
 }
 
+/* FIXME: implement */
 void
 free(void *ptr)
 {
