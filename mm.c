@@ -336,17 +336,27 @@ vm_request(uint32_t vaddr, int length)
 }
 
 int
-vm_return(uint32_t vaddr)
+vm_return(uint32_t vaddr, int length)
 {
+    char success;
+    int i;
     uint16_t pdiri, ptabi;
-    uint32_t pfa;
-    pdiri = vaddr_get_pdir(vaddr); 
-    ptabi = vaddr_get_ptab(vaddr); 
-    if(vm_page_is_assigned(mm.pdir, pdiri, ptabi)) {
-        pfa = vm_page_get_pfa(mm.pdir, pdiri, ptabi);
-        bitmap_return_pfa(mm.pfbm, pfa);
-        vm_page_unassign(mm.pdir, pdiri, ptabi);
-        return MM_SYS_SUCCESS;
+    uint32_t vaddri, pfa;
+    for(i = 0; i < length; i++) {
+        vaddri = vaddr + i * MM_PAGE_SIZE;
+        pdiri = vaddr_get_pdir(vaddri); 
+        ptabi = vaddr_get_ptab(vaddri); 
+        success = 0;
+        if(vm_page_is_assigned(mm.pdir, pdiri, ptabi)) {
+            pfa = vm_page_get_pfa(mm.pdir, pdiri, ptabi);
+            bitmap_return_pfa(mm.pfbm, pfa);
+            vm_page_unassign(mm.pdir, pdiri, ptabi);
+            success = 1;
+        }
+
+        if(!success) {
+            return MM_SYS_ERROR;
+        }
     }
-    return MM_SYS_ERROR;
+    return (i == length) ? MM_SYS_SUCCESS : MM_SYS_ERROR;
 }

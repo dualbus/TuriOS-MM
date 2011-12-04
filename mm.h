@@ -79,7 +79,7 @@ void        vm_page_unassign(ptab_entry_t *, uint16_t, uint16_t);
 
 /* Syscalls */
 int         vm_request(uint32_t, int);
-int         vm_return(uint32_t);
+int         vm_return(uint32_t, int);
 
 /* MM */
 typedef struct mm {

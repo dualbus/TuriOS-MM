@@ -80,24 +80,26 @@ int main(void)
 
     do {
         int i;
-        struct vm_return_args {
+        struct vm_request_args {
             uint32_t vaddr;
+            int length;
             int expected;
             char finish;
         };
 
-        struct vm_return_args vra[] = {
-            {0,     1, 1},
-            {4096,  1, 1},
-            {4096,  0, 1},
-            {8192,  1, 1},
-            {0,     0, 0},
+        struct vm_request_args vra[] = {
+            {0,     1, 1, 1},
+            {4096,  1, 1, 1},
+            {4096,  1, 0, 1},
+            {8192,  3, 1, 1},
+            {0,     0, 0, 0},
         };
     
         for(i = 0; 0 < vra[i].finish; i++) {
-            printf("vm_return(%d) => %d | %d\n",
+            printf("vm_return(%d, %d) => %d | %d\n",
                 vra[i].vaddr,
-                vm_return(vra[i].vaddr),
+                vra[i].length,
+                vm_return(vra[i].vaddr, vra[i].length),
                 vra[i].expected
             );
         }
