@@ -44,8 +44,6 @@ int main(void)
     ptab_load(mm.pdir);
     
     /* Start tests */
-    puts("vm_request");
-    puts("----------");
 
     do {
         int i;
@@ -63,6 +61,9 @@ int main(void)
             {8192,  3, 1, 1},
             {0,     0, 0, 0},
         };
+
+        puts("vm_request");
+        puts("----------");
     
         for(i = 0; 0 < vra[i].finish; i++) {
             printf("vm_request(%d, %d) => %d | %d\n",
@@ -72,28 +73,11 @@ int main(void)
                 vra[i].expected
             );
         }
-    } while(0);
 
-    puts("");
-    puts("vm_return");
-    puts("----------");
+        puts("");
 
-    do {
-        int i;
-        struct vm_request_args {
-            uint32_t vaddr;
-            int length;
-            int expected;
-            char finish;
-        };
-
-        struct vm_request_args vra[] = {
-            {0,     1, 1, 1},
-            {4096,  1, 1, 1},
-            {4096,  1, 0, 1},
-            {8192,  3, 1, 1},
-            {0,     0, 0, 0},
-        };
+        puts("vm_return");
+        puts("----------");
     
         for(i = 0; 0 < vra[i].finish; i++) {
             printf("vm_return(%d, %d) => %d | %d\n",
