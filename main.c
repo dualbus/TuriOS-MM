@@ -10,6 +10,7 @@ extern mm_t mm; /* mm.h */
 int main(void)
 {
     int i;
+    gdt_entry_t *gdt;
     ptab_entry_t *ptab;
 
     /* Not so magical emulation */
@@ -22,9 +23,17 @@ int main(void)
     mm.pdir = (ptab_entry_t *)  (mbase +  1 * MM_PAGE_SIZE);
     ptab = (ptab_entry_t *)     (mbase +  2 * MM_PAGE_SIZE);
 
-    mm.gdt = (gdt_ptr_t *)    (mbase + 10 * MM_PAGE_SIZE);
+    mm.gdt = (gdt_ptr_t *)      (mbase + 10 * MM_PAGE_SIZE);
+    gdt = (gdt_ptr_t *)         (mbase + 11 * MM_PAGE_SIZE);
     /* Emulation ends here */
 
+    /* Prepare the environment */
+    mm.gdt->base = (uint32_t)gdt;
+    gdt_add(mm.gdt, 0, 0, 0, 0, 0);                 /* Null segment */
+    gdt_add(mm.gdt, 1, 0, 0xffffffff, 0x9a, 0xcf);  /* CS */
+    gdt_add(mm.gdt, 2, 0, 0xffffffff, 0x92, 0xcf);  /* DS */
+    gdt_add(mm.gdt, 3, 0, 0xffffffff, 0xfa, 0xcf);  /* User-mode CS */
+    gdt_add(mm.gdt, 4, 0, 0xffffffff, 0xf2, 0xcf);  /* User-mode DS */
     gdt_load(mm.gdt);
     bitmap_clear(mm.pfbm);
     for(i = 0; i < 1024; i++) {
@@ -34,7 +43,7 @@ int main(void)
     ptab_entry_set_pfa(mm.pdir, (uint32_t)ptab);
     ptab_load(mm.pdir);
     
-
+    /* Start tests */
     puts("vm_request");
     puts("----------");
 

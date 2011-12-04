@@ -32,13 +32,17 @@ typedef struct gdt_entry {
 }           gdt_entry_t;
 
 void        gdt_load(gdt_ptr_t *); /* defined in pc.c */
-void        gdt_add(void);
+void        gdt_add(gdt_ptr_t *, int, uint32_t, uint32_t, uint8_t, uint8_t);
 
 void        gdt_entry_clear(gdt_entry_t *);
-uint32_t    gdt_entry_get_limit(gdt_entry_t *);
-void        gdt_entry_set_limit(gdt_entry_t *, uint32_t);
 uint32_t    gdt_entry_get_base(gdt_entry_t *);
 void        gdt_entry_set_base(gdt_entry_t *, uint32_t);
+uint32_t    gdt_entry_get_limit(gdt_entry_t *);
+void        gdt_entry_set_limit(gdt_entry_t *, uint32_t);
+uint8_t     gdt_entry_get_access(gdt_entry_t *);
+void        gdt_entry_set_access(gdt_entry_t *, uint8_t);
+uint8_t     gdt_entry_get_flags(gdt_entry_t *);
+void        gdt_entry_set_flags(gdt_entry_t *, uint8_t);
 uint8_t     gdt_entry_get_bit_p(gdt_entry_t *);
 void        gdt_entry_set_bit_p(gdt_entry_t *, uint8_t);
 uint8_t     gdt_entry_get_priv(gdt_entry_t *);

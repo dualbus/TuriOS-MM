@@ -4,6 +4,24 @@
 
 /* GDT */
 void
+gdt_add(    gdt_ptr_t *ptr,
+            int index,
+            uint32_t base,
+            uint32_t limit,
+            uint8_t access,
+            uint8_t flags
+            )
+{
+    gdt_entry_t *gdt = (gdt_entry_t *)(ptr->base);
+    gdt_entry_clear(&gdt[index]);
+    gdt_entry_set_base(&gdt[index], base);
+    gdt_entry_set_limit(&gdt[index], limit);
+    gdt_entry_set_access(&gdt[index], access);
+    gdt_entry_set_flags(&gdt[index], flags);
+    ptr->limit++;
+}
+
+void
 gdt_entry_clear(gdt_entry_t *entry)
 {
     entry->limit_low = 0;
@@ -12,21 +30,6 @@ gdt_entry_clear(gdt_entry_t *entry)
     entry->access = 0x10;           /* Weird stuff */
     entry->limit_high_flags = 0;
     entry->base_high = 0;
-}
-
-uint32_t
-gdt_entry_get_limit(gdt_entry_t *entry)
-{
-    return ((entry->limit_high_flags & 0xf) << 16)
-                | entry->limit_low;
-}
-
-void
-gdt_entry_set_limit(gdt_entry_t *entry, uint32_t limit)
-{
-    entry->limit_low = (uint16_t)(limit & 0xffff);
-    entry->limit_high_flags = (entry->limit_high_flags & 0xf)
-                                | (uint8_t)((limit & 0xf0000) >> 16);
 }
 
 
@@ -46,6 +49,23 @@ gdt_entry_set_base(gdt_entry_t *entry, uint32_t base)
     entry->base_high = (uint8_t)((base & 0xff000000) >> 24);
 }
 
+
+uint32_t
+gdt_entry_get_limit(gdt_entry_t *entry)
+{
+    return ((entry->limit_high_flags & 0xf) << 16)
+                | entry->limit_low;
+}
+
+void
+gdt_entry_set_limit(gdt_entry_t *entry, uint32_t limit)
+{
+    entry->limit_low = (uint16_t)(limit & 0xffff);
+    entry->limit_high_flags = (entry->limit_high_flags & 0xf)
+                                | (uint8_t)((limit & 0xf0000) >> 16);
+}
+
+
 uint8_t
 gdt_entry_get_bit_p(gdt_entry_t *entry)
 {
@@ -57,6 +77,33 @@ gdt_entry_set_bit_p(gdt_entry_t *entry, uint8_t bit_p)
 {
     entry->access = (entry->access & 0x7f)
                         | ((bit_p << 7) & 0x80);
+}
+
+
+uint8_t
+gdt_entry_get_access(gdt_entry_t *entry)
+{
+    return entry->access;
+}
+
+void
+gdt_entry_set_access(gdt_entry_t *entry, uint8_t access)
+{
+    entry->access = entry->access & 0x10;
+}
+
+
+uint8_t
+gdt_entry_get_flags(gdt_entry_t *entry)
+{
+    return entry->limit_high_flags & 0xc0;
+}
+
+void
+gdt_entry_set_flags(gdt_entry_t *entry, uint8_t flags)
+{
+    entry->access = (entry->access & 0xf)
+                        | (flags & 0xc0);
 }
 
 
