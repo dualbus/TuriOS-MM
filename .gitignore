@@ -1,3 +1,5 @@
 prog
 *.o
 *.swp
+*.cproject
+*.project
