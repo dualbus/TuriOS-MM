@@ -67,20 +67,6 @@ gdt_entry_set_limit(gdt_entry_t *entry, uint32_t limit)
 
 
 uint8_t
-gdt_entry_get_bit_p(gdt_entry_t *entry)
-{
-    return (entry->access & 0x80) >> 7;
-}
-
-void
-gdt_entry_set_bit_p(gdt_entry_t *entry, uint8_t bit_p)
-{
-    entry->access = (entry->access & 0x7f)
-                        | ((bit_p << 7) & 0x80);
-}
-
-
-uint8_t
 gdt_entry_get_access(gdt_entry_t *entry)
 {
     return entry->access;
@@ -104,105 +90,6 @@ gdt_entry_set_flags(gdt_entry_t *entry, uint8_t flags)
 {
     entry->access = (entry->access & 0xf)
                         | (flags & 0xc0);
-}
-
-
-uint8_t
-gdt_entry_get_priv(gdt_entry_t *entry)
-{
-    return (entry->access & 0x60) >> 5;
-}
-
-void
-gdt_entry_set_priv(gdt_entry_t *entry, uint8_t priv)
-{
-    entry->access = (entry->access & 0x9f)
-                       | ((priv << 5) & 0x60);
-}
-
-
-uint8_t
-gdt_entry_get_bit_x(gdt_entry_t *entry)
-{
-    return (entry->access & 8) >> 3;
-}
-
-void
-gdt_entry_set_bit_x(gdt_entry_t *entry, uint8_t bit_x)
-{
-    entry->access = (entry->access & 0xf7)
-                        | ((bit_x << 3) & 8);
-}
-
-
-uint8_t
-gdt_entry_get_bit_dc(gdt_entry_t *entry)
-{
-    return (entry->access & 4) >> 2;
-}
-
-void
-gdt_entry_set_bit_dc(gdt_entry_t *entry, uint8_t bit_dc)
-{
-    entry->access = (entry->access & 0xfb)
-                        | ((bit_dc << 2) & 4);
-}
-
-
-uint8_t
-gdt_entry_get_bit_rw(gdt_entry_t *entry)
-{
-    return (entry->access & 2) >> 1;
-}
-
-void
-gdt_entry_set_bit_rw(gdt_entry_t *entry, uint8_t bit_rw)
-{
-    entry->access = (entry->access & 0xfd)
-                        | ((bit_rw << 1) & 2);
-}
-
-
-uint8_t
-gdt_entry_get_bit_a(gdt_entry_t *entry)
-{
-    return entry->access & 1;
-}
-
-void
-gdt_entry_set_bit_a(gdt_entry_t *entry, uint8_t bit_a)
-{
-    entry->access = (entry->access & 0xfe)
-                        | (bit_a & 1);
-}
-
-
-
-uint8_t
-gdt_entry_get_bit_g(gdt_entry_t *entry)
-{
-    return (entry->limit_high_flags & 0x80) >> 7;
-}
-
-void
-gdt_entry_set_bit_g(gdt_entry_t *entry, uint8_t bit_g)
-{
-    entry->limit_high_flags = (entry->limit_high_flags & 0x7f)
-                        | ((bit_g << 7) & 0x80);
-}
-
-
-uint8_t
-gdt_entry_get_bit_s(gdt_entry_t *entry)
-{
-    return (entry->limit_high_flags & 0x40) >> 6;
-}
-
-void
-gdt_entry_set_bit_s(gdt_entry_t *entry, uint8_t bit_s)
-{
-    entry->limit_high_flags = (entry->limit_high_flags & 0xbf)
-                        | ((bit_s << 6) & 0x40);
 }
 
 

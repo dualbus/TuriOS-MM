@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS += -W -Wall -Wstrict-prototypes -ansi -pedantic -g
+CFLAGS += -W -Wall -Wstrict-prototypes -ansi -pedantic -g -Os
 
 SRCS = 	main.c		\
 		mm.c		\

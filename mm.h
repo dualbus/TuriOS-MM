@@ -43,22 +43,6 @@ uint8_t     gdt_entry_get_access(gdt_entry_t *);
 void        gdt_entry_set_access(gdt_entry_t *, uint8_t);
 uint8_t     gdt_entry_get_flags(gdt_entry_t *);
 void        gdt_entry_set_flags(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_p(gdt_entry_t *);
-void        gdt_entry_set_bit_p(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_priv(gdt_entry_t *);
-void        gdt_entry_set_priv(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_x(gdt_entry_t *);
-void        gdt_entry_set_bit_x(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_dc(gdt_entry_t *);
-void        gdt_entry_set_bit_dc(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_rw(gdt_entry_t *);
-void        gdt_entry_set_bit_rw(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_a(gdt_entry_t *);
-void        gdt_entry_set_bit_a(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_g(gdt_entry_t *);
-void        gdt_entry_set_bit_g(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_s(gdt_entry_t *);
-void        gdt_entry_set_bit_s(gdt_entry_t *, uint8_t);
 
 /* Page Table Entry */
 typedef uint32_t ptab_entry_t;
