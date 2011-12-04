@@ -10,7 +10,7 @@ extern mm_t mm; /* mm.h */
 int main(void)
 {
     int i;
-    gdt_entry_t *gdt;
+    gdt_entry_t *gdt_base;
     ptab_entry_t *ptab;
 
     /* Not so magical emulation */
@@ -24,11 +24,11 @@ int main(void)
     ptab = (ptab_entry_t *)     (mbase +  2 * MM_PAGE_SIZE);
 
     mm.gdt = (gdt_ptr_t *)      (mbase + 10 * MM_PAGE_SIZE);
-    gdt = (gdt_ptr_t *)         (mbase + 11 * MM_PAGE_SIZE);
+    gdt_base = (gdt_entry_t *)         (mbase + 11 * MM_PAGE_SIZE);
     /* Emulation ends here */
 
     /* Prepare the environment */
-    mm.gdt->base = (uint32_t)gdt;
+    mm.gdt->base = (uint32_t)gdt_base;
     gdt_add(mm.gdt, 0, 0, 0, 0, 0);                 /* Null segment */
     gdt_add(mm.gdt, 1, 0, 0xffffffff, 0x9a, 0xcf);  /* CS */
     gdt_add(mm.gdt, 2, 0, 0xffffffff, 0x92, 0xcf);  /* DS */

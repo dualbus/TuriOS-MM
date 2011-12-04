@@ -12,12 +12,12 @@ gdt_add(    gdt_ptr_t *ptr,
             uint8_t flags
             )
 {
-    gdt_entry_t *gdt = (gdt_entry_t *)(ptr->base);
-    gdt_entry_clear(&gdt[index]);
-    gdt_entry_set_base(&gdt[index], base);
-    gdt_entry_set_limit(&gdt[index], limit);
-    gdt_entry_set_access(&gdt[index], access);
-    gdt_entry_set_flags(&gdt[index], flags);
+    gdt_entry_t *gdt_base = (gdt_entry_t *)(ptr->base);
+    gdt_entry_clear(&gdt_base[index]);
+    gdt_entry_set_base(&gdt_base[index], base);
+    gdt_entry_set_limit(&gdt_base[index], limit);
+    gdt_entry_set_access(&gdt_base[index], access);
+    gdt_entry_set_flags(&gdt_base[index], flags);
     ptr->limit++;
 }
 
@@ -75,7 +75,7 @@ gdt_entry_get_access(gdt_entry_t *entry)
 void
 gdt_entry_set_access(gdt_entry_t *entry, uint8_t access)
 {
-    entry->access = entry->access & 0x10;
+    entry->access = access & 0x10;
 }
 
 
@@ -88,8 +88,8 @@ gdt_entry_get_flags(gdt_entry_t *entry)
 void
 gdt_entry_set_flags(gdt_entry_t *entry, uint8_t flags)
 {
-    entry->access = (entry->access & 0xf)
-                        | (flags & 0xc0);
+    entry->limit_high_flags = (entry->limit_high_flags & 0xf)
+                                | (flags & 0xc0);
 }
 
 
@@ -263,18 +263,18 @@ bitmap_return_pfa(bitmap_t *bitmap, uint32_t pfa)
 
 
 char
-vm_page_is_assigned(uint16_t pdiri, uint16_t ptabi)
+vm_page_is_assigned(ptab_entry_t *pdir, uint16_t pdiri, uint16_t ptabi)
 {
     ptab_entry_t *ptab;
-    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&mm.pdir[pdiri]);
+    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&pdir[pdiri]);
     return ptab_entry_get_bit_p(&ptab[ptabi]);
 }
 
 void
-vm_page_assign(uint16_t pdiri, uint16_t ptabi, uint32_t pfa)
+vm_page_assign(ptab_entry_t *pdir, uint16_t pdiri, uint16_t ptabi, uint32_t pfa)
 {
     ptab_entry_t *ptab;
-    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&mm.pdir[pdiri]);
+    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&pdir[pdiri]);
     ptab_entry_set_pfa(&ptab[ptabi], pfa);
     ptab_entry_set_bit_us(&ptab[ptabi], 1);
     ptab_entry_set_bit_rw(&ptab[ptabi], 1);
@@ -282,18 +282,18 @@ vm_page_assign(uint16_t pdiri, uint16_t ptabi, uint32_t pfa)
 }
 
 void
-vm_page_unassign(uint16_t pdiri, uint16_t ptabi)
+vm_page_unassign(ptab_entry_t *pdir, uint16_t pdiri, uint16_t ptabi)
 {
     ptab_entry_t *ptab;
-    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&mm.pdir[pdiri]);
+    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&pdir[pdiri]);
     ptab_entry_clear(&ptab[ptabi]);
 }
 
 uint32_t
-vm_page_get_pfa(uint16_t pdiri, uint16_t ptabi)
+vm_page_get_pfa(ptab_entry_t *pdir, uint16_t pdiri, uint16_t ptabi)
 {
     ptab_entry_t *ptab;
-    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&mm.pdir[pdiri]);
+    ptab = (ptab_entry_t *)ptab_entry_get_pfa(&pdir[pdiri]);
     return ptab_entry_get_pfa(&ptab[ptabi]);
 }
 
@@ -312,9 +312,9 @@ vm_request(uint32_t vaddr, int length)
         pdiri = vaddr_get_pdir(vaddri); 
         ptabi = vaddr_get_ptab(vaddri); 
         success = 0;
-        if(!vm_page_is_assigned(pdiri, ptabi)) {
+        if(!vm_page_is_assigned(mm.pdir, pdiri, ptabi)) {
             if(bitmap_request_pfa(mm.pfbm, &pfa)) {
-                vm_page_assign(pdiri, ptabi, pfa);
+                vm_page_assign(mm.pdir, pdiri, ptabi, pfa);
                 success = 1;
             }
         }
@@ -325,9 +325,9 @@ vm_request(uint32_t vaddr, int length)
                 vaddri = vaddr + i * MM_PAGE_SIZE;
                 pdiri = vaddr_get_pdir(vaddri); 
                 ptabi = vaddr_get_ptab(vaddri); 
-                pfa = vm_page_get_pfa(pdiri, ptabi);
+                pfa = vm_page_get_pfa(mm.pdir, pdiri, ptabi);
                 bitmap_return_pfa(mm.pfbm, pfa);
-                vm_page_unassign(pdiri, ptabi);
+                vm_page_unassign(mm.pdir, pdiri, ptabi);
             }
             return MM_SYS_ERROR;
         }
@@ -342,10 +342,10 @@ vm_return(uint32_t vaddr)
     uint32_t pfa;
     pdiri = vaddr_get_pdir(vaddr); 
     ptabi = vaddr_get_ptab(vaddr); 
-    if(vm_page_is_assigned(pdiri, ptabi)) {
-        pfa = vm_page_get_pfa(pdiri, ptabi);
+    if(vm_page_is_assigned(mm.pdir, pdiri, ptabi)) {
+        pfa = vm_page_get_pfa(mm.pdir, pdiri, ptabi);
         bitmap_return_pfa(mm.pfbm, pfa);
-        vm_page_unassign(pdiri, ptabi);
+        vm_page_unassign(mm.pdir, pdiri, ptabi);
         return MM_SYS_SUCCESS;
     }
     return MM_SYS_ERROR;

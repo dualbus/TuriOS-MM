@@ -73,9 +73,9 @@ uint8_t     bitmap_get_bit(bitmap_t *, int, int);
 void        bitmap_set_bit(bitmap_t *, int, int, uint8_t);
 char        bitmap_request_pfa(bitmap_t *, uint32_t *);
 
-char        vm_page_is_assigned(uint16_t, uint16_t);
-void        vm_page_assign(uint16_t, uint16_t, uint32_t);
-void        vm_page_unassign(uint16_t, uint16_t);
+char        vm_page_is_assigned(ptab_entry_t *, uint16_t, uint16_t);
+void        vm_page_assign(ptab_entry_t *, uint16_t, uint16_t, uint32_t);
+void        vm_page_unassign(ptab_entry_t *, uint16_t, uint16_t);
 
 /* Syscalls */
 int         vm_request(uint32_t, int);
