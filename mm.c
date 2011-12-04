@@ -9,7 +9,7 @@ gdt_entry_clear(gdt_entry_t *entry)
     entry->limit_low = 0;
     entry->base_low = 0;
     entry->base_middle = 0;
-    entry->access = 0;
+    entry->access = 0x10;           /* Weird stuff */
     entry->limit_high_flags = 0;
     entry->base_high = 0;
 }
@@ -55,122 +55,107 @@ gdt_entry_get_bit_p(gdt_entry_t *entry)
 void
 gdt_entry_set_bit_p(gdt_entry_t *entry, uint8_t bit_p)
 {
-    if(bit_p)
-        entry->access |= 0x80;
-    else
-        entry->access &= 0x7f;
+    entry->access = (entry->access & 0x7f)
+                        | ((bit_p << 7) & 0x80);
 }
 
 
 uint8_t
-gdt_entry_get_bit_priv(gdt_entry_t *entry)
+gdt_entry_get_priv(gdt_entry_t *entry)
 {
-    return (entry->access & 0x40) >> 6;
+    return (entry->access & 0x60) >> 5;
 }
 
 void
-gdt_entry_set_bit_priv(gdt_entry_t *entry, uint8_t bit_priv)
+gdt_entry_set_priv(gdt_entry_t *entry, uint8_t priv)
 {
-    if(bit_priv)
-        entry->access |= 0x40;
-    else
-        entry->access &= 0xbf;
+    entry->access = (entry->access & 0x9f)
+                       | ((priv << 5) & 0x60);
 }
 
 
 uint8_t
 gdt_entry_get_bit_x(gdt_entry_t *entry)
 {
-    return (entry->access & 0x20) >> 5;
+    return (entry->access & 8) >> 3;
 }
 
 void
 gdt_entry_set_bit_x(gdt_entry_t *entry, uint8_t bit_x)
 {
-    if(bit_x)
-        entry->access |= 0x20;
-    else
-        entry->access &= 0xdf;
+    entry->access = (entry->access & 0xf7)
+                        | ((bit_x << 3) & 8);
 }
 
 
 uint8_t
 gdt_entry_get_bit_dc(gdt_entry_t *entry)
 {
-    return (entry->access & 0x10) >> 4;
+    return (entry->access & 4) >> 2;
 }
 
 void
 gdt_entry_set_bit_dc(gdt_entry_t *entry, uint8_t bit_dc)
 {
-    if(bit_dc)
-        entry->access |= 0x10;
-    else
-        entry->access &= 0xef;
+    entry->access = (entry->access & 0xfb)
+                        | ((bit_dc << 2) & 4);
 }
 
 
 uint8_t
 gdt_entry_get_bit_rw(gdt_entry_t *entry)
 {
-    return (entry->access & 8) >> 3;
+    return (entry->access & 2) >> 1;
 }
 
 void
 gdt_entry_set_bit_rw(gdt_entry_t *entry, uint8_t bit_rw)
 {
-    if(bit_rw)
-        entry->access |= 8;
-    else
-        entry->access &= 0xf7;
+    entry->access = (entry->access & 0xfd)
+                        | ((bit_rw << 1) & 2);
 }
 
 
 uint8_t
 gdt_entry_get_bit_a(gdt_entry_t *entry)
 {
-    return (entry->access & 4) >> 2;
+    return entry->access & 1;
 }
 
 void
 gdt_entry_set_bit_a(gdt_entry_t *entry, uint8_t bit_a)
 {
-    if(bit_a)
-        entry->access |= 4;
-    else
-        entry->access &= 0xfb;
+    entry->access = (entry->access & 0xfe)
+                        | (bit_a & 1);
 }
+
 
 
 uint8_t
 gdt_entry_get_bit_g(gdt_entry_t *entry)
 {
-    return (entry->access & 2) >> 1;
+    return (entry->limit_high_flags & 0x80) >> 7;
 }
 
 void
 gdt_entry_set_bit_g(gdt_entry_t *entry, uint8_t bit_g)
 {
-    if(bit_g)
-        entry->access |= 2;
-    else
-        entry->access &= 0xfd;
+    entry->limit_high_flags = (entry->limit_high_flags & 0x7f)
+                        | ((bit_g << 7) & 0x80);
 }
 
 
 uint8_t
 gdt_entry_get_bit_s(gdt_entry_t *entry)
 {
-    return entry->access & 1;
+    return (entry->limit_high_flags & 0x40) >> 6;
 }
 
 void
 gdt_entry_set_bit_s(gdt_entry_t *entry, uint8_t bit_s)
 {
-    if(bit_s)
-        entry->access |= 1;
-    else
-        entry->access &= 0xfe;
+    entry->limit_high_flags = (entry->limit_high_flags & 0xbf)
+                        | ((bit_s << 6) & 0x40);
 }
 
 
@@ -180,86 +165,6 @@ void
 ptab_entry_clear(ptab_entry_t *entry)
 {
     *entry = 0;
-}
-
-
-uint8_t
-ptab_entry_get_bit_p(ptab_entry_t *entry)
-{
-    return *entry & 1;
-}
-
-void
-ptab_entry_set_bit_p(ptab_entry_t *entry, uint8_t bit_p)
-{
-    if(bit_p)
-        *entry |= 1;
-    else
-        *entry &= 0xfe; 
-}
-
-
-uint8_t
-ptab_entry_get_bit_rw(ptab_entry_t *entry)
-{
-    return (*entry & 2) >> 1;
-}
-
-void
-ptab_entry_set_bit_rw(ptab_entry_t *entry, uint8_t bit_rw)
-{
-    if(bit_rw)
-        *entry |= 2;
-    else
-        *entry &= 0xfd;
-}
-
-
-uint8_t
-ptab_entry_get_bit_us(ptab_entry_t *entry)
-{
-    return (*entry & 4) >> 2;
-}
-
-void
-ptab_entry_set_bit_us(ptab_entry_t *entry, uint8_t bit_us)
-{
-    if(bit_us)
-        *entry |= 4;
-    else
-        *entry &= 0xfb;
-}
-
-
-uint8_t
-ptab_entry_get_bit_d(ptab_entry_t *entry)
-{
-    return (*entry & 0x20) >> 5;
-}
-
-void
-ptab_entry_set_bit_d(ptab_entry_t *entry, uint8_t bit_d)
-{
-    if(bit_d)
-        *entry |= 0x20;
-    else
-        *entry &= 0xef;
-}
-
-
-uint8_t
-ptab_entry_get_bit_a(ptab_entry_t *entry)
-{
-    return (*entry & 0x40) >> 6;
-}
-
-void
-ptab_entry_set_bit_a(ptab_entry_t *entry, uint8_t bit_a)
-{
-    if(bit_a)
-        *entry |= 0x40;
-    else
-        *entry &= 0xdf;
 }
 
 
@@ -275,6 +180,73 @@ ptab_entry_set_pfa(ptab_entry_t *entry, uint32_t pfa)
     pfa &= 0xfffff000; /* 20-bit */
     *entry = (*entry & 0xfff) | pfa;
 }
+
+
+uint8_t
+ptab_entry_get_bit_a(ptab_entry_t *entry)
+{
+    return (*entry & 0x40) >> 6;
+}
+
+void
+ptab_entry_set_bit_a(ptab_entry_t *entry, uint8_t bit_a)
+{
+    *entry = (*entry & 0xdf) | ((bit_a << 6) & 0x40);
+}
+
+
+uint8_t
+ptab_entry_get_bit_d(ptab_entry_t *entry)
+{
+    return (*entry & 0x20) >> 5;
+}
+
+void
+ptab_entry_set_bit_d(ptab_entry_t *entry, uint8_t bit_d)
+{
+    *entry = (*entry & 0xef) | ((bit_d << 5) & 0x20);
+}
+
+
+uint8_t
+ptab_entry_get_bit_us(ptab_entry_t *entry)
+{
+    return (*entry & 4) >> 2;
+}
+
+void
+ptab_entry_set_bit_us(ptab_entry_t *entry, uint8_t bit_us)
+{
+    *entry = (*entry & 0xfb) | ((bit_us << 2) & 4);
+}
+
+
+uint8_t
+ptab_entry_get_bit_rw(ptab_entry_t *entry)
+{
+    return (*entry & 2) >> 1;
+}
+
+void
+ptab_entry_set_bit_rw(ptab_entry_t *entry, uint8_t bit_rw)
+{
+    *entry = (*entry & 0xfd) | ((bit_rw << 1) & 2);
+}
+
+
+uint8_t
+ptab_entry_get_bit_p(ptab_entry_t *entry)
+{
+    return *entry & 1;
+}
+
+void
+ptab_entry_set_bit_p(ptab_entry_t *entry, uint8_t bit_p)
+{
+    *entry = (*entry & 0xfe) | (bit_p & 1);
+}
+
+
 
 uint16_t
 vaddr_get_pdir(uint32_t vaddr)

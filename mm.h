@@ -32,6 +32,7 @@ typedef struct gdt_entry {
 }           gdt_entry_t;
 
 void        gdt_load(gdt_ptr_t *); /* defined in pc.c */
+void        gdt_add(void);
 
 void        gdt_entry_clear(gdt_entry_t *);
 uint32_t    gdt_entry_get_limit(gdt_entry_t *);
@@ -40,8 +41,8 @@ uint32_t    gdt_entry_get_base(gdt_entry_t *);
 void        gdt_entry_set_base(gdt_entry_t *, uint32_t);
 uint8_t     gdt_entry_get_bit_p(gdt_entry_t *);
 void        gdt_entry_set_bit_p(gdt_entry_t *, uint8_t);
-uint8_t     gdt_entry_get_bit_priv(gdt_entry_t *);
-void        gdt_entry_set_bit_priv(gdt_entry_t *, uint8_t);
+uint8_t     gdt_entry_get_priv(gdt_entry_t *);
+void        gdt_entry_set_priv(gdt_entry_t *, uint8_t);
 uint8_t     gdt_entry_get_bit_x(gdt_entry_t *);
 void        gdt_entry_set_bit_x(gdt_entry_t *, uint8_t);
 uint8_t     gdt_entry_get_bit_dc(gdt_entry_t *);
@@ -61,18 +62,18 @@ typedef uint32_t ptab_entry_t;
 void        ptab_load(ptab_entry_t *); /* defined in pc.c */
 
 void        ptab_entry_clear(ptab_entry_t *);
-uint8_t     ptab_entry_get_bit_p(ptab_entry_t *);
-void        ptab_entry_set_bit_p(ptab_entry_t *, uint8_t);
-uint8_t     ptab_entry_get_bit_rw(ptab_entry_t *);
-void        ptab_entry_set_bit_rw(ptab_entry_t *, uint8_t);
-uint8_t     ptab_entry_get_bit_us(ptab_entry_t *);
-void        ptab_entry_set_bit_us(ptab_entry_t *, uint8_t);
-uint8_t     ptab_entry_get_bit_d(ptab_entry_t *);
-void        ptab_entry_set_bit_d(ptab_entry_t *, uint8_t);
-uint8_t     ptab_entry_get_bit_a(ptab_entry_t *);
-void        ptab_entry_set_bit_a(ptab_entry_t *, uint8_t);
 uint32_t    ptab_entry_get_pfa(ptab_entry_t *);
 void        ptab_entry_set_pfa(ptab_entry_t *, uint32_t);
+uint8_t     ptab_entry_get_bit_a(ptab_entry_t *);
+void        ptab_entry_set_bit_a(ptab_entry_t *, uint8_t);
+uint8_t     ptab_entry_get_bit_d(ptab_entry_t *);
+void        ptab_entry_set_bit_d(ptab_entry_t *, uint8_t);
+uint8_t     ptab_entry_get_bit_us(ptab_entry_t *);
+void        ptab_entry_set_bit_us(ptab_entry_t *, uint8_t);
+uint8_t     ptab_entry_get_bit_rw(ptab_entry_t *);
+void        ptab_entry_set_bit_rw(ptab_entry_t *, uint8_t);
+uint8_t     ptab_entry_get_bit_p(ptab_entry_t *);
+void        ptab_entry_set_bit_p(ptab_entry_t *, uint8_t);
 
 /* Free page frames */
 typedef struct bitmap {
