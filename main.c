@@ -15,7 +15,7 @@ int main(void)
 
     /* Not so magical emulation */
     char *mbase = (char *)(
-                            (unsigned int)&pc.mem[2 * MM_PAGE_SIZE]
+                            (uint32_t)&pc.mem[2 * MM_PAGE_SIZE]
                             & ~(MM_PAGE_SIZE - 1)
                             );
 

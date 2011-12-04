@@ -20,7 +20,8 @@ enum mm_k {
 typedef struct gdt_ptr {
     uint16_t    limit;
     uint32_t    base;
-}           gdt_ptr_t;
+}           __attribute__((packed))
+           gdt_ptr_t;
 
 typedef struct gdt_entry {
     uint16_t    limit_low;
@@ -29,7 +30,8 @@ typedef struct gdt_entry {
     uint8_t     access;
     uint8_t     limit_high_flags;
     uint8_t     base_high;
-}           gdt_entry_t;
+}           __attribute__((packed))
+            gdt_entry_t;
 
 void        gdt_load(gdt_ptr_t *); /* defined in pc.c */
 void        gdt_add(gdt_ptr_t *, int, uint32_t, uint32_t, uint8_t, uint8_t);
